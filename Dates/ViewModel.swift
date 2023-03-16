@@ -47,7 +47,7 @@ class ViewModel: ObservableObject {
     }
     
     func createCalendarDates(monthNumber: Int) {
-        todaysDate = Date.now
+        todaysDate = calendar.startOfDay(for: Date.now)
         getFirstDayOfSelectedMonth(monthNumber: monthNumber)
         getYearAndMonth()
         getWeekdaySymbols()
