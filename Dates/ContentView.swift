@@ -12,7 +12,7 @@ struct ContentView: View {
     @ObservedObject var vm = ViewModel()
     
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
                 HStack(spacing: 20) {
                     VStack(alignment: .leading, spacing: 10) {
@@ -56,17 +56,45 @@ struct ContentView: View {
                     ForEach(vm.allDates) { date in
                         Text(date.title)
                             .font(.callout)
-                            .foregroundColor(date.currentDate ? .accentColor : .primary)
+                            .foregroundColor(date.completed ? .accentColor : .primary)
                             .fontWeight(date.currentDate ? .bold : .light)
+                            .onTapGesture {
+                                withAnimation {
+                                    vm.loadTasks(date: date.date)
+                                }
+                                
+                            }
                     }
                 }
+                
+                ForEach(vm.tasks) { task in
+                    HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(task.title)
+                                .font(.headline)
+                            Text("Completed 10 times")
+                                .font(.callout)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                        
+                    }
+                    .padding(.vertical)
+                    .background(
+                        Color.secondary
+                            .opacity(0.1)
+                            .cornerRadius(5)
+                    )
+                }
             }
-            .padding()
             Spacer()
         }
+        .padding()
         .onAppear {
             currentMonth = vm.getCurrentMonthNumber
             vm.createCalendarDates(monthNumber: currentMonth)
+            vm.loadTasks(date: Date.now)
         }
     }
 }

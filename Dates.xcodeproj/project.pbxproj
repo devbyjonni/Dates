@@ -54,8 +54,8 @@
 			isa = PBXGroup;
 			children = (
 				FA3CF7A129C31A5400437CD9 /* DatesApp.swift */,
-				FA3CF7AF29C379E500437CD9 /* ViewModel.swift */,
 				FA3CF7A329C31A5400437CD9 /* ContentView.swift */,
+				FA3CF7AF29C379E500437CD9 /* ViewModel.swift */,
 				FA3CF7A529C31A5600437CD9 /* Assets.xcassets */,
 				FA3CF7A729C31A5600437CD9 /* Preview Content */,
 			);

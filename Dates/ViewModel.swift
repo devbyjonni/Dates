@@ -9,13 +9,22 @@ import Foundation
 
 struct CalendarDate: Identifiable {
     let id = UUID().uuidString
+    let date: Date
     let title: String
     let currentDate: Bool
+    let completed: Bool
 }
 
 struct Weekdays: Identifiable {
     let id = UUID().uuidString
     let title: String
+}
+
+struct Task: Identifiable {
+    let id = UUID().uuidString
+    let title: String
+    let completed: Bool
+    let date: Date
 }
 
 class ViewModel: ObservableObject {
@@ -32,6 +41,7 @@ class ViewModel: ObservableObject {
     
     init() {
         calendar.locale = .autoupdatingCurrent
+        loadSampleData()
     }
     
     var getCurrentMonthNumber: Int {
@@ -56,7 +66,10 @@ class ViewModel: ObservableObject {
         
         let calendarDates = dates.compactMap { date in
             let day = calendar.component(.day, from: date)
-            return CalendarDate(title: "\(day)", currentDate: isSameDate(date1: date, date2: todaysDate))
+            let task = sampleTasks.first { task in
+                isSameDate(date1: task.date , date2: date)
+            }
+            return CalendarDate(date: date, title: "\(day)", currentDate: isSameDate(date1: date, date2: todaysDate), completed: task?.completed ?? false)
         }
         allDates = calendarDates
     }
@@ -122,5 +135,49 @@ class ViewModel: ObservableObject {
         }
         
         return dates
+    }
+    
+    // Sample data
+    
+    func loadTasks(date: Date) {
+        var tempTasks = [Task]()
+        for task in sampleTasks {
+            if isSameDate(date1: task.date , date2: date) {
+                tempTasks.append(task)
+            }
+        }
+        tasks = tempTasks
+    }
+    
+    @Published var tasks: [Task] = []
+    
+    
+    private var sampleTasks: [Task] = []
+    
+    private func loadSampleData() {
+        sampleTasks = [
+            Task(title: "Task 1", completed: true, date: todaysDate),
+            Task(title: "Task 2", completed: true, date: todaysDate),
+            Task(title: "Task 3", completed: true, date: todaysDate),
+            Task(title: "Task 4", completed: true, date: todaysDate),
+            Task(title: "Task 5", completed: true, date: todaysDate),
+            Task(title: "Task 6", completed: true, date: todaysDate),
+            Task(title: "Task 7", completed: true, date: todaysDate),
+            
+            
+            Task(title: "Task 1", completed: true, date: getSampleData(offset: -1)),
+            Task(title: "Task 2", completed: true, date: getSampleData(offset: -1)),
+            Task(title: "Task 3", completed: true, date: getSampleData(offset: -1)),
+
+            
+            Task(title: "Task 1", completed: true, date: getSampleData(offset: -3)),
+            Task(title: "Task 1", completed: true, date: getSampleData(offset: -4)),
+            Task(title: "Task 1", completed: true, date: getSampleData(offset: -5))
+        ]
+    }
+    
+    private func getSampleData(offset: Int) -> Date {
+        let date = calendar.date(byAdding: .day, value: offset, to: Date())
+        return date ?? Date()
     }
 }
