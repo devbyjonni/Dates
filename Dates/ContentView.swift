@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var currentMonth = 0
-    @ObservedObject var vm = ViewModel()
+    private let columns = Array(repeating: GridItem(.flexible()), count: 7)
+    @State private var currentMonth = 0
+    @ObservedObject private var vm = ViewModel()
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -43,7 +44,6 @@ struct ContentView: View {
                 }
                 .padding(.horizontal)
                 
-                let columns = Array(repeating: GridItem(.flexible()), count: 7)
                 LazyVGrid(columns: columns) {
                     ForEach(vm.allWeekdays) { weekday in
                         Text(weekday.title.uppercased())
@@ -52,21 +52,17 @@ struct ContentView: View {
                             .foregroundColor(.secondary)
                     }
                 }
+                
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEach(vm.allDates) { date in
                         Text(date.title)
                             .font(.callout)
                             .foregroundColor(date.offset ? date.completed ? .accentColor : .secondary : date.completed ? .accentColor : .primary)
-
-                        
-                            .foregroundColor(date.completed ? .accentColor : .primary)
-                       
                             .fontWeight(date.isTodaysDate ? .bold : .light)
                             .onTapGesture {
                                 withAnimation {
                                     vm.loadTasks(date: date.date)
                                 }
-                                
                             }
                     }
                 }
@@ -82,7 +78,6 @@ struct ContentView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
-                        
                     }
                     .padding(.vertical)
                     .background(

@@ -87,7 +87,6 @@ class ViewModel: ObservableObject {
             // Determine if the date is within the valid offset range
             let isValidOffset = index <= offset || index >= postset
             
-            
             // Check if the date is the same as today's date
             let isTodaysDate = isSameDate(date1: date, date2: todaysDate)
             
