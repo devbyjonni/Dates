@@ -11,8 +11,9 @@ struct CalendarDate: Identifiable {
     let id = UUID().uuidString
     let date: Date
     let title: String
-    let currentDate: Bool
+    let isTodaysDate: Bool
     let completed: Bool
+    let offset: Bool
 }
 
 struct Weekdays: Identifiable {
@@ -38,6 +39,7 @@ class ViewModel: ObservableObject {
     private(set) var selectedMonth = ""
     
     @Published var allDates = [CalendarDate]()
+    @Published var tasks: [Task] = []
     
     init() {
         calendar.locale = .autoupdatingCurrent
@@ -62,14 +64,30 @@ class ViewModel: ObservableObject {
         getYearAndMonth()
         getWeekdaySymbols()
         
-        let dates = loadMonthCalendar(from: firstDayOfSelectedMonth)
-        
-        let calendarDates = dates.compactMap { date in
+        let data = loadMonthCalendar(from: firstDayOfSelectedMonth)
+        var offset = data.offsets
+        var numberOneDidShow = 0
+        var postset = false
+        let calendarDates = data.dates.enumerated().compactMap { (index, date) in
             let day = calendar.component(.day, from: date)
+            
+            // Set postset to true when the first day of the next month is found
+            if day == 1 {
+                numberOneDidShow += 1
+                if numberOneDidShow == 2 {
+                    postset = true
+                }
+            }
+            
+            // Get the associated task for the current date
             let task = sampleTasks.first { task in
                 isSameDate(date1: task.date , date2: date)
             }
-            return CalendarDate(date: date, title: "\(day)", currentDate: isSameDate(date1: date, date2: todaysDate), completed: task?.completed ?? false)
+            
+            // Determine if the date is within the valid offset range
+            let isValidOffset = index <= offset || postset
+
+            return CalendarDate(date: date, title: "\(day)", isTodaysDate: isSameDate(date1: date, date2: todaysDate), completed: task?.completed ?? false, offset: isValidOffset)
         }
         allDates = calendarDates
     }
@@ -83,14 +101,14 @@ class ViewModel: ObservableObject {
         firstDayOfSelectedMonth = calendar.date(from: startDateComponents)!
     }
     
-    private func loadMonthCalendar(from date: Date) -> [Date] {
+    private func loadMonthCalendar(from date: Date) -> (dates: [Date], offsets: Int) {
         let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
         let firstWeekdayOfMonth = calendar.component(.weekday, from: firstDayOfMonth)
         let offset = (firstWeekdayOfMonth - calendar.firstWeekday + 7) % 7
         let offsetDate = calendar.date(byAdding: .day, value: -offset, to: firstDayOfMonth)!
         let dates = (0..<totalDays).compactMap { calendar.date(byAdding: .day, value: $0, to: offsetDate) }
         
-        return dates
+        return (dates, offset)
     }
     
     private func isSameDate(date1: Date, date2: Date) -> Bool {
@@ -149,7 +167,7 @@ class ViewModel: ObservableObject {
         tasks = tempTasks
     }
     
-    @Published var tasks: [Task] = []
+
     
     
     private var sampleTasks: [Task] = []
@@ -164,15 +182,13 @@ class ViewModel: ObservableObject {
             Task(title: "Task 6", completed: true, date: todaysDate),
             Task(title: "Task 7", completed: true, date: todaysDate),
             
-            
             Task(title: "Task 1", completed: true, date: getSampleData(offset: -1)),
             Task(title: "Task 2", completed: true, date: getSampleData(offset: -1)),
             Task(title: "Task 3", completed: true, date: getSampleData(offset: -1)),
-
             
             Task(title: "Task 1", completed: true, date: getSampleData(offset: -3)),
             Task(title: "Task 1", completed: true, date: getSampleData(offset: -4)),
-            Task(title: "Task 1", completed: true, date: getSampleData(offset: -5))
+            Task(title: "Task 1", completed: true, date: getSampleData(offset: -17))
         ]
     }
     

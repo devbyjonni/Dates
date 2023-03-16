@@ -56,8 +56,12 @@ struct ContentView: View {
                     ForEach(vm.allDates) { date in
                         Text(date.title)
                             .font(.callout)
+                            .foregroundColor(date.offset ? date.completed ? .accentColor : .secondary : date.completed ? .accentColor : .primary)
+
+                        
                             .foregroundColor(date.completed ? .accentColor : .primary)
-                            .fontWeight(date.currentDate ? .bold : .light)
+                       
+                            .fontWeight(date.isTodaysDate ? .bold : .light)
                             .onTapGesture {
                                 withAnimation {
                                     vm.loadTasks(date: date.date)
