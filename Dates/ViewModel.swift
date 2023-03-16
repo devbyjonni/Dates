@@ -65,7 +65,7 @@ class ViewModel: ObservableObject {
         getWeekdaySymbols()
         
         let data = loadMonthCalendar(from: firstDayOfSelectedMonth)
-        var offset = data.offsets
+        let offset = data.offsets
         var numberOneDidShow = 0
         var postset = false
         let calendarDates = data.dates.enumerated().compactMap { (index, date) in
@@ -156,7 +156,6 @@ class ViewModel: ObservableObject {
     }
     
     // Sample data
-    
     func loadTasks(date: Date) {
         var tempTasks = [Task]()
         for task in sampleTasks {
@@ -166,12 +165,7 @@ class ViewModel: ObservableObject {
         }
         tasks = tempTasks
     }
-    
-
-    
-    
     private var sampleTasks: [Task] = []
-    
     private func loadSampleData() {
         sampleTasks = [
             Task(title: "Task 1", completed: true, date: todaysDate),
